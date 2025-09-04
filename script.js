@@ -20,27 +20,27 @@ const addSpacerElement = () => {
 };
 
 const addItem = (data) => {
-  const card = document.createElement("div");
-  card.classList.add("card");
-  card.textContent = data.value;
-  card.style.top = `${data.top}px`;
-  return card;
+  const item = document.createElement("div");
+  item.classList.add("card");
+  item.textContent = data.value;
+  item.style.top = `${data.top}px`;
+  return item;
 };
 
-const addItemsList = (itemList = []) => {
-  itemList.forEach((item) => {
-    container.appendChild(addItem(item));
+const addItemsList = (argDataList = []) => {
+  argDataList.forEach((data) => {
+    container.appendChild(addItem(data));
   });
 };
 
 const addInitialItems = () => {
   const itemHeight = getItemHeight();
-  const slicedItem = dataList.slice(0, 10).map((item, index) => ({
+  const slicedData = dataList.slice(0, 10).map((item, index) => ({
     ...item,
     top: currentScrollTop + index * itemHeight,
   }));
   addSpacerElement();
-  addItemsList(slicedItem);
+  addItemsList(slicedData);
 };
 
 const getItemHeight = () => {
@@ -55,28 +55,34 @@ const getNumberOfItemsWithinViewport = () => {
   return getContainerHeight() / getItemHeight();
 };
 
-const handleContainerScroll = (e) => {
-  currentScrollTop = e.target.scrollTop;
+const getDataListToRender = () => {
   const itemHeight = getItemHeight();
   const itemsAboveViewport = Math.floor(currentScrollTop / itemHeight);
   const itemsWithinViewport = getNumberOfItemsWithinViewport();
 
+  return dataList
+    .slice(
+      Math.max(0, itemsAboveViewport),
+      itemsAboveViewport + itemsWithinViewport + 5
+    )
+    .map((item, index) => ({
+      ...item,
+      top:
+        Math.floor(currentScrollTop / ITEM_HEIGHT) * ITEM_HEIGHT +
+        index * itemHeight,
+    }));
+};
+
+const handleContainerScroll = (e) => {
+  currentScrollTop = e.target.scrollTop;
+  const itemHeight = getItemHeight();
+
   if (Math.abs(currentScrollTop - previousScrollTop) >= itemHeight) {
-    const slicedItem = dataList
-      .slice(
-        Math.max(0, itemsAboveViewport),
-        itemsAboveViewport + itemsWithinViewport + 5
-      )
-      .map((item, index) => ({
-        ...item,
-        top:
-          Math.floor(currentScrollTop / ITEM_HEIGHT) * ITEM_HEIGHT +
-          index * itemHeight,
-      }));
+    const slicedData = getDataListToRender();
     previousScrollTop = currentScrollTop;
     container.innerHTML = "";
     addSpacerElement();
-    addItemsList(slicedItem);
+    addItemsList(slicedData);
   }
 };
 
