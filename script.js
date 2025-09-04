@@ -7,7 +7,6 @@ import {
 const container = document.getElementById("container");
 const spacer = document.getElementById("spacer");
 
-let previousScrollTop = 0;
 let currentScrollTop = 0;
 const dataList = generateDataList();
 const bufferItemsCount = 5;
@@ -75,14 +74,10 @@ const getDataListToRender = () => {
 
 const handleVirtualizedScroll = (e) => {
   currentScrollTop = e.target.scrollTop;
+  const slicedDataList = getDataListToRender();
 
-  if (Math.abs(currentScrollTop - previousScrollTop) >= ITEM_HEIGHT) {
-    const slicedDataList = getDataListToRender();
-    previousScrollTop = currentScrollTop;
-    spacer.innerHTML = "";
-
-    renderItems(slicedDataList);
-  }
+  spacer.innerHTML = "";
+  renderItems(slicedDataList);
 };
 
 container.addEventListener("scroll", handleVirtualizedScroll);
