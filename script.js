@@ -1,11 +1,11 @@
 const container = document.getElementById("container");
-const numberOfCards = 10;
-const numberOfBufferedItems = 5;
+const numberOfCards = 1000;
 const ITEM_HEIGHT = 40;
 const items = Array(numberOfCards)
   .fill(0)
   .map((item, index) => ({ value: `Card ${index + 1}`, top: 0 }));
 
+let previousScrollTop = 0;
 let scrollTop = 0;
 const createNewCard = (item) => {
   const card = document.createElement("div");
@@ -29,11 +29,12 @@ const addCards = (cardList = []) => {
 };
 
 const getItemHeight = () => {
-  const borderWidth = 1;
-  const itemHeight =
-    document.querySelector(".card")?.clientHeight ||
-    ITEM_HEIGHT + 2 * borderWidth;
-  return itemHeight;
+  // const borderWidth = 1;
+  // const itemHeight =
+  //   document.querySelector(".card")?.clientHeight ||
+  //   ITEM_HEIGHT + 2 * borderWidth;
+  // return itemHeight;
+  return ITEM_HEIGHT;
 };
 
 const getContainerHeight = () => {
@@ -53,23 +54,27 @@ container.addEventListener("scroll", (e) => {
 
   const numberOfItemsInViewPort = getNumberOfItemsInViewPort();
 
-  const slicedItem = items
-    .slice(
-      Math.max(0, itemsAboveViewport - numberOfBufferedItems),
-      itemsAboveViewport + numberOfItemsInViewPort + 1 + numberOfBufferedItems
-    )
-    .map((item, index) => ({
-      ...item,
-      top: scrollTop + index * itemHeight,
-    }));
-  container.innerHTML = "";
-  addSpacerElement();
-  addCards(slicedItem);
+  if (Math.abs(scrollTop - previousScrollTop) >= itemHeight) {
+    const slicedItem = items
+      .slice(
+        itemsAboveViewport,
+        itemsAboveViewport + numberOfItemsInViewPort + 5
+      )
+      .map((item, index) => ({
+        ...item,
+        top: scrollTop + index * itemHeight,
+      }));
+    console.log(scrollTop, previousScrollTop, scrollTop / itemHeight);
+    previousScrollTop = scrollTop;
+    container.innerHTML = "";
+    addSpacerElement();
+    addCards(slicedItem);
+  }
 });
 
 const addInitialItems = () => {
-  const itemHeight = 40;
-  const slicedItem = items.slice(0, 20).map((item, index) => ({
+  const itemHeight = getItemHeight();
+  const slicedItem = items.slice(0, 10).map((item, index) => ({
     ...item,
     top: scrollTop + index * itemHeight,
   }));
