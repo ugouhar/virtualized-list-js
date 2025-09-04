@@ -1,6 +1,6 @@
 const container = document.getElementById("container");
-const numberOfCards = 1000;
-const ITEM_HEIGHT = 40;
+const numberOfCards = 300;
+const ITEM_HEIGHT = 50;
 const items = Array(numberOfCards)
   .fill(0)
   .map((item, index) => ({ value: `Card ${index + 1}`, top: 0 }));
@@ -62,7 +62,9 @@ container.addEventListener("scroll", (e) => {
       )
       .map((item, index) => ({
         ...item,
-        top: scrollTop + index * itemHeight,
+        top:
+          Math.floor(scrollTop / ITEM_HEIGHT) * ITEM_HEIGHT +
+          index * itemHeight,
       }));
     console.log(scrollTop, previousScrollTop, scrollTop / itemHeight);
     previousScrollTop = scrollTop;
