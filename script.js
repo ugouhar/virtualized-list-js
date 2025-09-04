@@ -1,14 +1,20 @@
-import { ITEM_HEIGHT, NUMBER_OF_CARDS } from "./constants.js";
+import {
+  INITIAL_ITEMS_COUNT,
+  ITEM_HEIGHT,
+  NUMBER_OF_CARDS,
+} from "./constants.js";
 
 const container = document.getElementById("container");
+
 let previousScrollTop = 0;
 let currentScrollTop = 0;
 const dataList = generateDataList();
+const bufferItemsCount = 5;
 
 function generateDataList() {
   const data = Array(NUMBER_OF_CARDS)
     .fill(0)
-    .map((_, index) => ({ value: `Card ${index + 1}`, top: 0 }));
+    .map((_, index) => ({ value: `Card ${index + 1}` }));
   return data;
 }
 
@@ -19,7 +25,7 @@ const addSpacerElement = () => {
   container.appendChild(spacer);
 };
 
-const addItem = (data) => {
+const createItem = (data) => {
   const item = document.createElement("div");
   item.classList.add("card");
   item.textContent = data.value;
@@ -27,62 +33,57 @@ const addItem = (data) => {
   return item;
 };
 
-const addItemsList = (argDataList = []) => {
+const renderItems = (argDataList = []) => {
   argDataList.forEach((data) => {
-    container.appendChild(addItem(data));
+    container.appendChild(createItem(data));
   });
 };
 
 const addInitialItems = () => {
-  const itemHeight = getItemHeight();
-  const slicedData = dataList.slice(0, 10).map((item, index) => ({
-    ...item,
-    top: currentScrollTop + index * itemHeight,
-  }));
+  const slicedData = dataList
+    .slice(0, INITIAL_ITEMS_COUNT)
+    .map((item, index) => ({
+      ...item,
+      top: currentScrollTop + index * ITEM_HEIGHT,
+    }));
   addSpacerElement();
-  addItemsList(slicedData);
-};
-
-const getItemHeight = () => {
-  return ITEM_HEIGHT;
+  renderItems(slicedData);
 };
 
 const getContainerHeight = () => {
-  return document.getElementById("container").clientHeight;
+  return container.clientHeight;
 };
 
-const getNumberOfItemsWithinViewport = () => {
-  return getContainerHeight() / getItemHeight();
+const getVisibleItemsCount = () => {
+  return Math.floor(getContainerHeight() / ITEM_HEIGHT);
 };
 
 const getDataListToRender = () => {
-  const itemHeight = getItemHeight();
-  const itemsAboveViewport = Math.floor(currentScrollTop / itemHeight);
-  const itemsWithinViewport = getNumberOfItemsWithinViewport();
+  const aboveViewportItemsCount = Math.floor(currentScrollTop / ITEM_HEIGHT);
+  const withinViewportItemsCount = getVisibleItemsCount();
 
   return dataList
     .slice(
-      Math.max(0, itemsAboveViewport),
-      itemsAboveViewport + itemsWithinViewport + 5
+      aboveViewportItemsCount,
+      aboveViewportItemsCount + withinViewportItemsCount + bufferItemsCount
     )
     .map((item, index) => ({
       ...item,
       top:
         Math.floor(currentScrollTop / ITEM_HEIGHT) * ITEM_HEIGHT +
-        index * itemHeight,
+        index * ITEM_HEIGHT,
     }));
 };
 
 const handleContainerScroll = (e) => {
   currentScrollTop = e.target.scrollTop;
-  const itemHeight = getItemHeight();
 
-  if (Math.abs(currentScrollTop - previousScrollTop) >= itemHeight) {
+  if (Math.abs(currentScrollTop - previousScrollTop) >= ITEM_HEIGHT) {
     const slicedData = getDataListToRender();
     previousScrollTop = currentScrollTop;
     container.innerHTML = "";
     addSpacerElement();
-    addItemsList(slicedData);
+    renderItems(slicedData);
   }
 };
 
