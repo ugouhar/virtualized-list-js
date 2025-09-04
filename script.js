@@ -5,6 +5,7 @@ import {
 } from "./constants.js";
 
 const container = document.getElementById("container");
+const spacer = document.getElementById("spacer");
 
 let previousScrollTop = 0;
 let currentScrollTop = 0;
@@ -18,11 +19,8 @@ function generateDataList() {
   return data;
 }
 
-const addSpacerElement = () => {
-  const spacer = document.createElement("div");
-  spacer.classList.add("spacer");
+const updaterSpacerHeight = () => {
   spacer.style.height = `${NUMBER_OF_CARDS * ITEM_HEIGHT}px`;
-  container.appendChild(spacer);
 };
 
 const createItem = (data) => {
@@ -33,21 +31,21 @@ const createItem = (data) => {
   return item;
 };
 
-const renderItems = (argDataList = []) => {
-  argDataList.forEach((data) => {
-    container.appendChild(createItem(data));
+const renderItems = (slicedDataList = []) => {
+  slicedDataList.forEach((data) => {
+    spacer.appendChild(createItem(data));
   });
 };
 
 const addInitialItems = () => {
-  const slicedData = dataList
+  const slicedDataList = dataList
     .slice(0, INITIAL_ITEMS_COUNT)
     .map((item, index) => ({
       ...item,
       top: currentScrollTop + index * ITEM_HEIGHT,
     }));
-  addSpacerElement();
-  renderItems(slicedData);
+
+  renderItems(slicedDataList);
 };
 
 const getContainerHeight = () => {
@@ -75,17 +73,23 @@ const getDataListToRender = () => {
     }));
 };
 
-const handleContainerScroll = (e) => {
+const handleVirtualizedScroll = (e) => {
   currentScrollTop = e.target.scrollTop;
 
   if (Math.abs(currentScrollTop - previousScrollTop) >= ITEM_HEIGHT) {
-    const slicedData = getDataListToRender();
+    const slicedDataList = getDataListToRender();
     previousScrollTop = currentScrollTop;
-    container.innerHTML = "";
-    addSpacerElement();
-    renderItems(slicedData);
+    spacer.innerHTML = "";
+
+    renderItems(slicedDataList);
   }
 };
 
-container.addEventListener("scroll", handleContainerScroll);
-addInitialItems();
+container.addEventListener("scroll", handleVirtualizedScroll);
+
+const initialize = () => {
+  updaterSpacerHeight();
+  addInitialItems();
+};
+
+initialize();
