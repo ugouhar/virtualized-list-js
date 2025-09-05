@@ -1,7 +1,7 @@
-import { NUMBER_OF_CARDS } from "./constants.js";
+import { TOTAL_NUMBER_OF_ITEMS } from "./constants.js";
 
 export const generateDataList = () => {
-  const data = Array(NUMBER_OF_CARDS)
+  const data = Array(TOTAL_NUMBER_OF_ITEMS)
     .fill(0)
     .map((_, index) => ({ value: index + 1 }));
   return data;
@@ -12,10 +12,10 @@ export const createItem = (data) => {
   item.classList.add("card");
   item.style.top = `${data.top}px`;
 
-  ["Top", "Middle", "Bottom"].forEach((element) => {
-    const el = document.createElement("div");
-    el.textContent = `${element} ${data.value}`;
-    item.appendChild(el);
+  ["Top", "Middle", "Bottom"].forEach((val) => {
+    const element = document.createElement("div");
+    element.textContent = `${val} ${data.value}`;
+    item.appendChild(element);
   });
   return item;
 };

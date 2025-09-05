@@ -1,7 +1,7 @@
 import {
-  INITIAL_ITEMS_COUNT,
+  INITIAL_NUMBER_OF_ITEMS,
   ITEM_HEIGHT,
-  NUMBER_OF_CARDS,
+  TOTAL_NUMBER_OF_ITEMS,
 } from "./constants.js";
 import { createItem, generateDataList } from "./utils.js";
 
@@ -12,23 +12,26 @@ const bufferItemsCount = 5;
 let currentScrollTop = 0;
 
 const updateSpacerHeight = () => {
-  spacer.style.height = `${NUMBER_OF_CARDS * ITEM_HEIGHT}px`;
+  spacer.style.height = `${TOTAL_NUMBER_OF_ITEMS * ITEM_HEIGHT}px`;
+};
+
+const sliceListAndAddTopPosition = (startIdx, endIdx) => {
+  const offset = Math.floor(currentScrollTop / ITEM_HEIGHT) * ITEM_HEIGHT;
+  const slicedDataList = dataList
+    .slice(startIdx, endIdx)
+    .map((item, index) => ({
+      ...item,
+      top: offset + index * ITEM_HEIGHT,
+    }));
+  return slicedDataList;
 };
 
 const renderItems = (slicedDataList = []) => {
-  slicedDataList.forEach((data) => {
-    spacer.appendChild(createItem(data));
-  });
+  slicedDataList.forEach((data) => spacer.appendChild(createItem(data)));
 };
 
 const renderInitialItems = () => {
-  const slicedDataList = dataList
-    .slice(0, INITIAL_ITEMS_COUNT)
-    .map((item, index) => ({
-      ...item,
-      top: currentScrollTop + index * ITEM_HEIGHT,
-    }));
-
+  const slicedDataList = sliceListAndAddTopPosition(0, INITIAL_NUMBER_OF_ITEMS);
   renderItems(slicedDataList);
 };
 
@@ -44,17 +47,11 @@ const getDataListToRender = () => {
   const aboveViewportItemsCount = Math.floor(currentScrollTop / ITEM_HEIGHT);
   const withinViewportItemsCount = getVisibleItemsCount();
 
-  return dataList
-    .slice(
-      aboveViewportItemsCount,
-      aboveViewportItemsCount + withinViewportItemsCount + bufferItemsCount
-    )
-    .map((item, index) => ({
-      ...item,
-      top:
-        Math.floor(currentScrollTop / ITEM_HEIGHT) * ITEM_HEIGHT +
-        index * ITEM_HEIGHT,
-    }));
+  const startIdx = aboveViewportItemsCount;
+  const endIdx =
+    aboveViewportItemsCount + withinViewportItemsCount + bufferItemsCount;
+
+  return sliceListAndAddTopPosition(startIdx, endIdx);
 };
 
 const handleVirtualizedScroll = () => {

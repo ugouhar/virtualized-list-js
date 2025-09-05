@@ -1,3 +1,3 @@
-export const NUMBER_OF_CARDS = 1000;
 export const ITEM_HEIGHT = 50;
-export const INITIAL_ITEMS_COUNT = 10;
+export const INITIAL_NUMBER_OF_ITEMS = 10;
+export const TOTAL_NUMBER_OF_ITEMS = 1000;
