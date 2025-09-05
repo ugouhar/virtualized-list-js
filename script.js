@@ -17,7 +17,7 @@ function generateDataList() {
   return data;
 }
 
-const updaterSpacerHeight = () => {
+const updateSpacerHeight = () => {
   spacer.style.height = `${NUMBER_OF_CARDS * ITEM_HEIGHT}px`;
 };
 
@@ -80,18 +80,26 @@ const getDataListToRender = () => {
     }));
 };
 
-const handleVirtualizedScroll = (e) => {
-  currentScrollTop = e.target.scrollTop;
-  const slicedDataList = getDataListToRender();
-
-  spacer.innerHTML = "";
-  renderItems(slicedDataList);
+const handleVirtualizedScroll = () => {
+  let ticking = false;
+  return function (e) {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        currentScrollTop = e.target.scrollTop;
+        const slicedDataList = getDataListToRender();
+        spacer.innerHTML = "";
+        renderItems(slicedDataList);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  };
 };
 
-container.addEventListener("scroll", handleVirtualizedScroll);
+container.addEventListener("scroll", handleVirtualizedScroll());
 
 const initialize = () => {
-  updaterSpacerHeight();
+  updateSpacerHeight();
   renderInitialItems();
 };
 
