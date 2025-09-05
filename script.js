@@ -6,15 +6,14 @@ import {
 
 const container = document.getElementById("container");
 const spacer = document.getElementById("spacer");
-
-let currentScrollTop = 0;
 const dataList = generateDataList();
 const bufferItemsCount = 5;
+let currentScrollTop = 0;
 
 function generateDataList() {
   const data = Array(NUMBER_OF_CARDS)
     .fill(0)
-    .map((_, index) => ({ value: `Card ${index + 1}` }));
+    .map((_, index) => ({ value: index + 1 }));
   return data;
 }
 
@@ -24,8 +23,17 @@ const updaterSpacerHeight = () => {
 
 const createItem = (data) => {
   const item = document.createElement("div");
+  const topElement = document.createElement("div");
+  topElement.textContent = "Top " + data.value;
+  const middleElement = document.createElement("div");
+  middleElement.textContent = "Middle " + data.value;
+  const bottomElement = document.createElement("div");
+  bottomElement.textContent = "Bottom " + data.value;
+
   item.classList.add("card");
-  item.textContent = data.value;
+  item.appendChild(topElement);
+  item.appendChild(middleElement);
+  item.appendChild(bottomElement);
   item.style.top = `${data.top}px`;
   return item;
 };
@@ -36,7 +44,7 @@ const renderItems = (slicedDataList = []) => {
   });
 };
 
-const addInitialItems = () => {
+const renderInitialItems = () => {
   const slicedDataList = dataList
     .slice(0, INITIAL_ITEMS_COUNT)
     .map((item, index) => ({
@@ -84,7 +92,7 @@ container.addEventListener("scroll", handleVirtualizedScroll);
 
 const initialize = () => {
   updaterSpacerHeight();
-  addInitialItems();
+  renderInitialItems();
 };
 
 initialize();

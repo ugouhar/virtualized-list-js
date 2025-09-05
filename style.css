@@ -2,6 +2,8 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  font-family: sans-serif;
+  color: #494949;
 }
 
 #container {
@@ -15,13 +17,22 @@
 }
 .card {
   border: 1px solid black;
-  padding: 8px;
   height: 50px;
   position: absolute;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  justify-content: space-between;
+}
+.card div {
+  padding-left: 10px;
 }
 
-#spacer {
+.card div:nth-child(even) {
+  background-color: #ddd;
+}
+.card #spacer {
   width: 100%;
 }
 
